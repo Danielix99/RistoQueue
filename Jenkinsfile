@@ -44,9 +44,11 @@ pipeline {
 
         stage('publish') {
             when {
-                allOf {
-                    branch 'main'
-                    not { changeRequest() }
+                expression {
+                    def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
+
+                    return !env.CHANGE_ID &&
+                        ['main', 'origin/main'].contains(branch)
                 }
             }
 
@@ -62,7 +64,7 @@ pipeline {
 
             post {
                 success {
-                    echo 'Test, build, deploy e publish completati'
+                    echo 'Immagini pubblicate su Docker Hub'
                 }
                 failure {
                     echo 'Publish fallito'
