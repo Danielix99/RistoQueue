@@ -10,12 +10,20 @@
       - --ports=30080:30080
 
 - name: installa dip helm
+  become: true
   ansible.builtin.apt:
     name:
       - ca-certificates
       - curl
       - tar
       - gzip
+
+- name: Scarica Helm 3
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    dest: /tmp/install-helm.sh
+    mode: "0700"
+    force: false
 
 - name: Installa Helm
   become: true
