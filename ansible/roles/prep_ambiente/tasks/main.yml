@@ -8,3 +8,17 @@
       - --profile=risto
       - --driver=docker
       - --ports=30080:30080
+
+- name: installa dip helm
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - tar
+      - gzip
+
+- name: Installa Helm
+  become: true
+  ansible.builtin.command:
+    cmd: bash /tmp/install-helm.sh
+    creates: /usr/local/bin/helm
