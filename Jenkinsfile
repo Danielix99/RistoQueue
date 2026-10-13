@@ -54,7 +54,7 @@ pipeline {
 
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
+                    credentialsId: 'Cred_docker_marco',
                     usernameVariable: 'DOCKERHUB_USER',
                     passwordVariable: 'DOCKERHUB_PASSWORD'
                 )]) {
@@ -64,7 +64,7 @@ pipeline {
 
             post {
                 success {
-                    echo 'Immagini pubblicate su Docker Hub'
+                    echo 'Test, build, deploy e publish completati'
                 }
                 failure {
                     echo 'Publish fallito'
