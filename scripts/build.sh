@@ -2,8 +2,8 @@
 
 TAG="$(git rev-parse --short=7 HEAD)"
 
-API_IMAGE="${marcobuccidev:ristoqueue-api}"
-WORKER_IMAGE="${marcobuccidev:ristoqueue-worker}"
+API_IMAGE="marcobuccidev/ristoqueue-api"
+WORKER_IMAGE="marcobuccidev/ristoqueue-worker"
 
 # build api
 docker build \
