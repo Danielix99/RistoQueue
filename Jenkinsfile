@@ -5,7 +5,6 @@ pipeline {
         stage('test') {
             steps {
                 sh '''
-                    apt install python3.12-venv -y
                     python3 -m venv .venv
                     .venv/bin/python -m pip install -r tests/requirements.txt
                     .venv/bin/python -m pytest -q tests/
