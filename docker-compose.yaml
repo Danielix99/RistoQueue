@@ -1,0 +1,42 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: app/api/Dockerfile
+      args:
+        GIT_SHA: ${GIT_SHA:-dev}
+    image: ${API_IMAGE:-ristoqueue-api}:${TAG:-dev}
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      VERSION: ${TAG:-dev}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: app/worker/Dockerfile
+      args:
+        GIT_SHA: ${GIT_SHA:-dev}
+    image: ${WORKER_IMAGE:-ristoqueue-worker}:${TAG:-dev}
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      VERSION: ${TAG:-dev}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
