@@ -1,5 +1,5 @@
 ---
-- name: Pubblica immagini su GHCR
+- name: Pubblica immagini su docker.io
   hosts: localhost
   connection: local
   gather_facts: false
