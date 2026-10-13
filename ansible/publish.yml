@@ -1,0 +1,32 @@
+---
+- name: Pubblica immagini su GHCR
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Recupera il tag del commit
+      ansible.builtin.command:
+        cmd: git rev-parse --short=7 HEAD
+        chdir: "{{ playbook_dir }}/.."
+      register: git_tag
+      changed_when: false
+
+    - name: Login su docker.io
+      ansible.builtin.command:
+        argv:
+          - docker
+          - login
+          - docker.io
+          - --username
+          - "{{ lookup('env', 'DOCKERHUB_USER') }}"
+          - --password-stdin
+        stdin: "{{ lookup('env', 'DOCKERHUB_PASSWORD') }}"
+      no_log: true
+
+    - name: Pubblica le immagini
+      ansible.builtin.command:
+        cmd: "docker push {{ item }}:{{ git_tag.stdout }}"
+      loop:
+    - marcobuccidev/ristoqueue-api
+    - marcobuccidev/ristoqueue-worker
