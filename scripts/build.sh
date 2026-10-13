@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# tag = SHA git corto a 7 caratteri
 TAG="$(git rev-parse --short=7 HEAD)"
 
-# ⚠️ Da C: nomi completi delle immagini (registry/repo)
 API_IMAGE="${marcobuccidev:ristoqueue-api}"
 WORKER_IMAGE="${marcobuccidev:ristoqueue-worker}"
 
