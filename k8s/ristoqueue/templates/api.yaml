@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      securityContext:
+        runAsNonRoot: true        
+        runAsUser: 10001            
+        runAsGroup: 10001
+      containers:
+        - name: api
+          image: marcobuccidev/ristoqueue-api:{{ .Values.tag }}
+          ports:
+            - containerPort: 8080
+          envFrom:                  
+            - configMapRef:
+                name: ristoqueue-config
+          env:                      
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-key
+                  key: API_KEY
+          readinessProbe:           
+            httpGet:
+              path: /readyz
+              port: 8080
+          livenessProbe:            
+            httpGet:
+              path: /healthz
+              port: 8080
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 50m
+            limits:
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  type: NodePort
+  selector:
+    app: api
+  ports:
+    - port: 8080
+      nodePort: 30080             
