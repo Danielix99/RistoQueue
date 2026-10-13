@@ -23,7 +23,7 @@ COPY --from=builder /install /usr/local
 COPY app/worker ./
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD python -m worker.health || exit 1
+  CMD python /app/healthcheck.py || exit 1
 
 USER 10001:10001
 
