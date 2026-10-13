@@ -5,4 +5,5 @@ metadata:
 data:
   REDIS_HOST: redis               
   QUEUE_NAME: orders                
+  REDIS_PORT: "6379"
   APP_VERSION: "{{ .Values.tag }}"  
