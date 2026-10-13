@@ -1,0 +1,10 @@
+---
+# tasks file for prep_ambiente
+- name: Crea cluster
+  ansible.builtin.command:
+    argv:
+      - minikube
+      - start
+      - --profile=risto
+      - --driver=docker
+      - --ports=30080:30080
