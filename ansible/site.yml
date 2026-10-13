@@ -1,0 +1,14 @@
+---
+- name: setup risto
+  hosts: localhost
+  become: false
+
+  vars_prompt:
+    - name: api_key
+      prompt: "Inserisci api-key"
+      private: true
+
+  roles:
+    - prep_ambiente
+    - deploy_app
+    - verifica_app
