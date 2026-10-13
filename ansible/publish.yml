@@ -28,5 +28,5 @@
       ansible.builtin.command:
         cmd: "docker push {{ item }}:{{ git_tag.stdout }}"
       loop:
-    - marcobuccidev/ristoqueue-api
-    - marcobuccidev/ristoqueue-worker
+        - marcobuccidev/ristoqueue-api
+        - marcobuccidev/ristoqueue-worker
