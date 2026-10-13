@@ -1,0 +1,54 @@
+---
+# tasks file for deploy_app
+- name: Seleziona il cluster Minikube
+  ansible.builtin.command: kubectl config use-context risto
+  changed_when: false
+
+- name: Build immagini
+  ansible.builtin.command:
+    cmd: bash scripts/build.sh
+    chdir: "{{ playbook_dir }}/.."
+  register: build_result
+
+- name: Recupera il tag delle immagini
+  ansible.builtin.set_fact:
+    image_tag: "{{ build_result.stdout_lines | last }}"
+
+- name: Carica le immagini in Minikube
+  ansible.builtin.command:
+    argv:
+      - minikube
+      - -p
+      - risto
+      - image
+      - load
+      - "{{ item }}:{{ image_tag }}"
+  loop:
+    - marcobuccidev/ristoqueue-api
+    - marcobuccidev/ristoqueue-worker
+
+- name: Crea/aggiorna il namespace
+  ansible.builtin.shell: |
+    set -o pipefail
+    kubectl create namespace ristoqueue --dry-run=client -o yaml |
+      kubectl apply -f -
+  args:
+    executable: /bin/bash
+  
+- name: Crea o aggiorna il Secret
+  ansible.builtin.shell: |
+    set -o pipefail
+    kubectl -n ristoqueue create secret generic api-key \
+      --from-literal=API_KEY="$API_KEY" \
+      --dry-run=client -o yaml |
+      kubectl apply -f -
+  args:
+    executable: /bin/bash
+  environment:
+    API_KEY: "{{ api_key }}"
+  no_log: true
+
+- name: Deploy applicazione
+  ansible.builtin.command:
+    cmd: "bash scripts/deploy.sh {{ image_tag }}"
+    chdir: "{{ playbook_dir }}/.."

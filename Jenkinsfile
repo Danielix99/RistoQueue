@@ -25,7 +25,11 @@ pipeline {
 
         stage ('e2e') {
             //build delle immagini, cluster kind dentro la pipeline, deploy, tests/acceptance.sh
-            steps { 
+            steps {
+                withCredentials([string(
+                    credentialsId: 'ristoqueue-api-key',
+                    variable: 'API_KEY'
+                )]) { 
                 sh 'ansible-playbook ansible/site.yml'
             }
         
@@ -40,19 +44,23 @@ pipeline {
             }
         }
 
-        stage ('publish') {
-            //push delle immagini su GHCR, solo su main, mai dalle PR
-            steps {
-                sh '''
-                if [ "$GIT_BRANCH" == "main" ]; then
-                    ansible-playbook ansible/publish.yml
-                else
-                    echo "Branch sbagliata"
-                fi
-                '''
+        stage('publish') {
+            when {
+                allOf {
+                    branch 'main'
+                    not { changeRequest() }
+                }
             }
-        
 
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'ghcr',
+                    usernameVariable: 'GHCR_USER',
+                    passwordVariable: 'GHCR_TOKEN'
+                )]) {
+                    sh 'ansible-playbook ansible/publish.yml'
+                }
+            }
             post {
                 success {
                     echo 'Test, build, deploy e publish completati.'

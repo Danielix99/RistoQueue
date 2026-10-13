@@ -1,12 +1,16 @@
 ---
-- name: setup risto
+- name: Setup risto
   hosts: localhost
+  connection: local
   become: false
 
   vars_prompt:
-    - name: api_key
-      prompt: "Inserisci api-key"
+    - name: api_key_input
+      prompt: "Inserisci API key"
       private: true
+
+  vars:
+    api_key: "{{ lookup('ansible.builtin.env', 'API_KEY') or api_key_input }}"
 
   roles:
     - prep_ambiente

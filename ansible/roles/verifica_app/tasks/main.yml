@@ -1,0 +1,13 @@
+---
+# tasks file for verifica_app
+- name: Esegui il test di accettazione
+  ansible.builtin.command: bash tests/acceptance.sh
+  args:
+    chdir: "{{ playbook_dir }}/.."
+  register: acceptance_result
+  changed_when: false
+
+- name: Mostra il risultato
+  ansible.builtin.debug:
+    msg: "{{ acceptance_result.stdout_lines }}"
+  
